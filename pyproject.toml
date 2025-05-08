@@ -1,6 +1,6 @@
 [project]
 name = "ctypespec"
-version = "0.1.1"
+version = "0.1.2"
 description = "Define, manage, and convert C types in Python via ctypes, from AST or C declarations."
 authors = [{ name = "kris.wang", email = "wenhom.wang@gmail.com" }]
 readme = "README.md"
@@ -12,6 +12,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+rtoml = "^0.12.0"
 
 [tool.ruff]
 
