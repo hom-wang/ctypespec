@@ -1,2 +1,2 @@
-__version__ = "0.1.0"
-__repository__ = r"https://github.com/Hom-Wang/ctypes_helper.git"
+__version__ = "0.1.1"
+__repository__ = r"https://github.com/Hom-Wang/ctypespec.git"
