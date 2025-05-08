@@ -97,7 +97,7 @@ _category_map = {
 }
 
 _bits_map = {
-    0: CTypeFlags.BIT8,
+    8: CTypeFlags.BIT8,
     16: CTypeFlags.BIT16,
     32: CTypeFlags.BIT32,
     64: CTypeFlags.BIT64,
