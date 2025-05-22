@@ -112,6 +112,7 @@ class CTypeDescriptor:
         self.category: str = category  # int | float
         self.bits: int = bits  # bit
         self.ctype = ctype  # ctype
+        self.bytes: int = bits // 8  # btyes
 
         self.flag: CTypeFlags = CTypeFlags.NONE
         self.flag |= _sign_map.get(self.sign, CTypeFlags.NONE)
@@ -258,6 +259,20 @@ class CTypeRegistry:
 
     def to_ctypes_name(self, type_str: str, _default: str = None) -> str:
         return self.map.get(type_str, _default)
+
+
+def compute_struct_size(fields: list[dict], alignment: int = 4) -> int:
+    sizes = [ctyp.get(v["type"]).bytes for v in fields]
+
+    offset = 0
+    for size in sizes:
+        align = min(size, alignment)
+        if offset % align != 0:
+            offset += align - (offset % align)
+        offset += size
+    if offset % alignment != 0:
+        offset += alignment - (offset % alignment)
+    return offset
 
 
 ctyp = CTypeRegistry()
