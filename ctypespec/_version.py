@@ -44,7 +44,7 @@ if __name__ == "__main__":
     import rtoml as toml
 
     project_toml = Path(__file__).parents[1] / "pyproject.toml"
-    metadata_file = Path(__file__).parent / "_metadata.py"
+    metadata_file = Path(__file__).parent / "_version.py"
 
     metadata = extract_metadata(project_toml)
     rtn = update_metadata(metadata_file, metadata)
