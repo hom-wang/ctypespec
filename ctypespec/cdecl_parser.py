@@ -1,7 +1,6 @@
 import json
 from itertools import product
 
-# from pathlib import Path
 from .ast_parser import ASTDecl
 from .ctype_helper import ctyp
 

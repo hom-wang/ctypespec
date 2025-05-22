@@ -237,6 +237,19 @@ class CTypeRegistry:
         self.types["char_ptr"] = CTypeDescriptor("char_ptr", "unsigned", "pointer", 32, c_char_p)  # 32-bit platform
         self.types["wchar_ptr"] = CTypeDescriptor("wchar_ptr", "unsigned", "pointer", 32, c_wchar_p)  # 32-bit platform
 
+        self.types["i8"] = CTypeDescriptor("i8", "signed", "int", 8, c_char)
+        self.types["u8"] = CTypeDescriptor("u8", "unsigned", "int", 8, c_ubyte)
+        self.types["i16"] = CTypeDescriptor("i16", "signed", "int", 16, c_short)
+        self.types["u16"] = CTypeDescriptor("u16", "unsigned", "int", 16, c_ushort)
+        self.types["i32"] = CTypeDescriptor("i32", "signed", "int", 32, c_int)
+        self.types["u32"] = CTypeDescriptor("u32", "unsigned", "int", 32, c_uint)
+        self.types["i64"] = CTypeDescriptor("i64", "signed", "int", 64, c_long)
+        self.types["u64"] = CTypeDescriptor("u64", "unsigned", "int", 64, c_ulong)
+        self.types["f32"] = CTypeDescriptor("f32", "signed", "float", 32, c_float)
+        self.types["f64"] = CTypeDescriptor("f64", "signed", "float", 64, c_double)
+        self.types["f128"] = CTypeDescriptor("f128", "signed", "float", 128, c_longdouble)
+        self.types["ptr"] = CTypeDescriptor("ptr", "unsigned", "pointer", 32, c_void_p)  # 32-bit platform
+
     def _init_ctype_name_map(self):
         self.map: dict = {k: v.ctype.__name__ for k, v in self.types.items()}
 
