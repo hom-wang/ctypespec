@@ -59,7 +59,7 @@ def headers_to_ast(
     )
     ast = generate_ast_dict(header, output_dir=output_dir)
     if clean:
-        ast = clean_ast_nodes(ast, include_files=[output_dir / f"{output_name}.h", *files])
+        ast = clean_ast_nodes(ast, include_files=[str(output_dir / f"{output_name}.h"), *files])
 
     if output_dir:
         with open(output_dir / "ast.json", "w") as f:
