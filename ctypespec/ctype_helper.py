@@ -255,7 +255,7 @@ class CTypeRegistry:
         self.map: dict = {k: v.ctype.__name__ for k, v in self.types.items()}
 
     def get(self, type_str: str) -> CTypeDescriptor | None:
-        return self.types.get(type_str, CTypeDescriptor("unknown", None, None, None, None))
+        return self.types.get(type_str, CTypeDescriptor("unknown", None, None, 0, None))
 
     def to_ctypes_name(self, type_str: str, _default: str = None) -> str:
         return self.map.get(type_str, _default)
