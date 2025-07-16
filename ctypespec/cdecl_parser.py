@@ -50,20 +50,20 @@ def expand_cobj(cobj: dict, output_file: str = None) -> dict[str, list[dict]]:
             return [""]
         return ["".join(f"[{i}]" for i in idx) for idx in product(*[range(s) for s in sizes])]
 
-    def expand_field(field: dict, name: str, prefix: str = "") -> list[dict]:
+    def expand_field(field: dict, name: str, prefix: str = "", parent_is_pointer: bool = None) -> list[dict]:
         full_name = f"{prefix}{name}" if prefix else name
         type_ = field["type"]
         typedef = field.get("typedef")
-
+        pointer = field.get("pointer", 0)
         size = field.get("size", [])
         indices = generate_indices(size)
 
         fields = []
         if type_ == "struct" and typedef in structs:
             for idx in indices:
-                for subname, sub in structs[typedef].items():
-                    sub_full = f"{full_name}{idx}."
-                    fields.extend(expand_field(sub, subname, sub_full))
+                for sub_name, sub_field in structs[typedef].items():
+                    sub_prefix = f"{full_name}{idx}."
+                    fields.extend(expand_field(sub_field, sub_name, prefix=sub_prefix, parent_is_pointer=(pointer > 0)))
         elif type_ == "enum":
             enum_type = enums.get("typedef", {}).get("type", "int")
             for idx in indices:
@@ -71,16 +71,20 @@ def expand_cobj(cobj: dict, output_file: str = None) -> dict[str, list[dict]]:
                     {
                         "name": f"{full_name}{idx}",
                         "type": enum_type,
-                        "pointer": field.get("pointer", 0),
+                        "pointer": pointer,
                     }
                 )
         else:
             for idx in indices:
+                if parent_is_pointer:
+                    parts = full_name.rsplit(".", 1)
+                    if len(parts) == 2:
+                        full_name = "->".join(parts)
                 fields.append(
                     {
                         "name": f"{full_name}{idx}",
                         "type": type_,
-                        "pointer": field.get("pointer", 0),
+                        "pointer": pointer,
                     }
                 )
         return fields
