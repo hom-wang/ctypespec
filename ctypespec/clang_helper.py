@@ -57,6 +57,7 @@ def preprocess_headers(
 
     res = subprocess.run(cmd, capture_output=True, cwd=cwd)
     if res.returncode != 0:
+        print("\n" + " ".join(cmd) + "\n")
         raise RuntimeError(res.stderr.decode())
 
     return output_file
@@ -85,6 +86,7 @@ def generate_ast_dict(input_file: str, output_dir: str = None, cwd: str = None) 
 
     res = subprocess.run(cmd, capture_output=True, cwd=cwd)
     if res.returncode != 0:
+        print("\n" + " ".join(cmd) + "\n")
         raise RuntimeError(res.stderr.decode())
 
     content = res.stdout.decode()

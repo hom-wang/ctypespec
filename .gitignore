@@ -1,6 +1,7 @@
 __pycache__
-poetry.lock
+uv.lock
 dist
 
+.venv
 .tmp
 .output

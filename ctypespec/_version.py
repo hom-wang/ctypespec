@@ -1,5 +1,5 @@
-__version__ = "0.1.4"
-__repository__ = r"https://github.com/Hom-Wang/ctypespec.git"
+__version__ = "0.1.5"
+__repository__ = r"https://github.com/hom-wang/ctypespec.git"
 
 
 def extract_metadata(project_toml: str) -> dict:
