@@ -79,10 +79,16 @@ class CTypeFlags(Flag):
 
         return None
 
-    def str2value(self, value: str) -> int | float | None:
-        if not isinstance(value, str) or self.is_pointer():
+    def str2value(self, value: str | int | float) -> int | float | None:
+        if self.is_pointer():
             return None
-        return int(value) if self.is_integer() else float(value)
+        if isinstance(value, str):
+            return int(value) if self.is_integer() else float(value)
+        if self.is_integer():
+            value = int(value)
+        elif self.is_float():
+            value = float(value)
+        return value
 
 
 _sign_map = {
@@ -150,7 +156,8 @@ class CTypeDescriptor:
     def clip(self, value) -> int | float | None:
         if self.min is None:
             return None
-        if value := self.flag.str2value(value):
+        value = self.flag.str2value(value)
+        if value is not None:
             return max(self.min, min(value, self.max))
         return None
 
