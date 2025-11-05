@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ctypespec"
-version = "0.1.7"
+version = "0.1.8"
 description = "Define, manage, and convert C types in Python via ctypes, from AST or C declarations."
 authors = [{ name = "kris.wang", email = "wenhom.wang@gmail.com" }]
 readme = "README.md"
@@ -12,8 +12,13 @@ license = "MIT"
 requires-python = ">=3.10"
 dependencies = []
 
+# uv sync --extra dev
 [project.optional-dependencies]
-dev = ["rtoml>=0.12.0"]
+dev = ["rtoml>=0.12.0", "pandas>=2.3.3"]
+
+# uv sync --no-dev
+# [dependency-groups]
+# dev = ["rtoml>=0.12.0", "pandas>=2.3.3"]
 
 [tool.uv]
 package = true
