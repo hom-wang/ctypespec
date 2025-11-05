@@ -97,7 +97,7 @@ def parse_qualtype(qualtype: str) -> dict:
 
     if is_function_pointer(qt):
         return {
-            "type": "function",
+            "type": "function_t",
             "typedef": None,
             "size": (),
             "pointer": 1,

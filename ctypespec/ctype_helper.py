@@ -258,6 +258,8 @@ class CTypeRegistry:
         self.types["f128"] = CTypeDescriptor("f128", "signed", "float", 128, c_longdouble)
         self.types["ptr"] = CTypeDescriptor("ptr", "unsigned", "pointer", 32, c_void_p)  # 32-bit platform
 
+        self.types["function_t"] = CTypeDescriptor("ptr", "unsigned", "pointer", 32, c_void_p)  # CFUNCTYPE(None)
+
     def _init_ctype_name_map(self):
         self.map: dict = {k: v.ctype.__name__ for k, v in self.types.items()}
 
