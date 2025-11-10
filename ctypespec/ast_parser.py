@@ -158,7 +158,7 @@ def parse_typedef(node: dict) -> dict:
         # TODO parse function and support "CompareValue, _Bool (void *, void *)"
         return {
             "name": node.get("name"),
-            "kind": "function",
+            "kind": "function_t",
             "underlying_id": None,
             "underlying_name": None,
             "underlying_type": None,

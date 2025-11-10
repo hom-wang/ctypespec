@@ -1,4 +1,4 @@
-__version__ = "0.1.8"
+__version__ = "0.1.9"
 __repository__ = r"https://github.com/hom-wang/ctypespec.git"
 
 
