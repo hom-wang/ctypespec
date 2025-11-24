@@ -9,7 +9,7 @@ ctype_fmt_prec = {
     "i32": r"%d",
     "u32": r"%d",
     "i64": r"%lld",
-    "u64": r"%lld",
+    "u64": r"%llu",
     "f32": r"%.6f",
     "f64": r"%.8f",
     "f128": r"%.8f",
@@ -62,7 +62,7 @@ class CTypeFlags(Flag):
     def bit(self) -> int:
         return self.value & CTypeFlags.BITS.value
 
-    def short(self):
+    def short(self) -> str:
         if self & CTypeFlags.POINTER:
             return "ptr"
 
@@ -112,7 +112,7 @@ _bits_map = {
 
 
 class CTypeDescriptor:
-    def __init__(self, name: str, sign: str, category: str, bits: int, ctype):  # noqa: C901
+    def __init__(self, name: str, sign: str, category: str, bits: int, ctype, fmt: str = None) -> None:  # noqa: C901
         self.name: str = name  # type name
         self.sign: str = sign  # signed | unsigned
         self.category: str = category  # int | float
@@ -126,7 +126,7 @@ class CTypeDescriptor:
         self.flag |= _bits_map.get(self.bits, CTypeFlags.NONE)
 
         self.short: str = self.flag.short()
-        self.fmt: str = ctype_fmt_prec.get(self.short)
+        self.fmt: str = fmt if fmt else ctype_fmt_prec.get(self.short)
 
         max_min_value = self._calc_min_max() if name != "bool" else (0, 1)
         self.min: int | float | None = max_min_value[0]  # min value
@@ -171,6 +171,14 @@ class CTypeDescriptor:
             converted_value = max(self.min, min(converted_value, self.max))
         return converted_value
 
+    def format_macros(self) -> str:
+        fmt = self.fmt
+        if self.name in ["int64_t", "__int64", "signed __int64"]:
+            return fmt.replace("%lld", '%" PRIi64 "')
+        if self.name in ["uint64_t", "unsigned __int64"]:
+            return fmt.replace("%llu", '%" PRIu64 "')
+        return fmt
+
 
 class CTypeRegistry:
     def __init__(self) -> None:
@@ -193,21 +201,23 @@ class CTypeRegistry:
         self.types["signed int"] = CTypeDescriptor("signed int", "signed", "int", 32, c_int)  # int32_t
         self.types["unsigned int"] = CTypeDescriptor("unsigned int", "unsigned", "int", 32, c_uint)  # uint32_t
 
-        self.types["long"] = CTypeDescriptor("long", "signed", "int", 64, c_long)  # int64_t
-        self.types["signed long"] = CTypeDescriptor("signed long", "signed", "int", 64, c_long)  # int64_t
-        self.types["unsigned long"] = CTypeDescriptor("unsigned long", "unsigned", "int", 64, c_ulong)  # uint64_t
+        self.types["long"] = CTypeDescriptor("long", "signed", "int", 64, c_long, r"%ld")  # int64_t
+        self.types["signed long"] = CTypeDescriptor("signed long", "signed", "int", 64, c_long, r"%ld")  # int64_t
+        self.types["unsigned long"] = CTypeDescriptor("unsigned long", "unsigned", "int", 64, c_ulong, r"%lu")  # uint64_t
 
-        self.types["long int"] = CTypeDescriptor("long int", "signed", "int", 64, c_long)
-        self.types["signed long int"] = CTypeDescriptor("signed long int", "signed", "int", 64, c_long)
-        self.types["unsigned long int"] = CTypeDescriptor("unsigned long int", "unsigned", "int", 64, c_ulong)
+        self.types["long int"] = CTypeDescriptor("long int", "signed", "int", 64, c_long, r"%ld")
+        self.types["signed long int"] = CTypeDescriptor("signed long int", "signed", "int", 64, c_long, r"%ld")
+        self.types["unsigned long int"] = CTypeDescriptor("unsigned long int", "unsigned", "int", 64, c_ulong, r"%lu")
 
-        self.types["long long"] = CTypeDescriptor("long long", "signed", "int", 64, c_long)
-        self.types["signed long long"] = CTypeDescriptor("signed long long", "signed", "int", 64, c_long)
-        self.types["unsigned long long"] = CTypeDescriptor("unsigned long long", "unsigned", "int", 64, c_ulong)
+        self.types["long long"] = CTypeDescriptor("long long", "signed", "int", 64, c_long, "%lld")
+        self.types["signed long long"] = CTypeDescriptor("signed long long", "signed", "int", 64, c_long, "%lld")
+        self.types["unsigned long long"] = CTypeDescriptor("unsigned long long", "unsigned", "int", 64, c_ulong, "%llu")
 
-        self.types["long long int"] = CTypeDescriptor("long long int", "signed", "int", 64, c_long)
-        self.types["signed long long int"] = CTypeDescriptor("signed long long int", "signed", "int", 64, c_long)
-        self.types["unsigned long long int"] = CTypeDescriptor("unsigned long long int", "unsigned", "int", 64, c_ulong)
+        self.types["long long int"] = CTypeDescriptor("long long int", "signed", "int", 64, c_long, "%lld")
+        self.types["signed long long int"] = CTypeDescriptor("signed long long int", "signed", "int", 64, c_long, "%lld")
+        self.types["unsigned long long int"] = CTypeDescriptor(
+            "unsigned long long int", "unsigned", "int", 64, c_ulong, "%llu"
+        )
 
         self.types["int8_t"] = CTypeDescriptor("int8_t", "signed", "int", 8, c_char)
         self.types["uint8_t"] = CTypeDescriptor("uint8_t", "unsigned", "int", 8, c_ubyte)
