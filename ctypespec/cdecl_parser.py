@@ -105,14 +105,27 @@ def get_record_name(record: dict) -> str:
     return record["typedef"] or record["name"]
 
 
-def decl_to_ctypes(decl: ASTDecl, output_file: str = None) -> str:
-    # TODO union
+def enum_to_ctypes(enums: dict) -> str:
+    content = []
 
-    structs = decl.struct
+    for enum in enums.values():
+        record_name = get_record_name(enum)
+        if record_name is None:
+            continue
 
-    import_content = ["from ctypes import *", ""]
-    # forward_content = ["# Forward declarations"]
-    # definition_content = ["# Full definitions"]
+        obj = [f"class {record_name}(IntEnum):"]
+        for k, v in enum.get("values", {}).items():
+            obj.append(f"    {k} = {v}")
+        obj = "\n".join(obj)
+
+        content.append("\n" + obj + "\n")
+
+    content = "\n".join(content)
+
+    return content
+
+
+def struct_to_ctypes(structs: dict) -> str:
     forward_content = []
     definition_content = []
 
@@ -163,7 +176,26 @@ def decl_to_ctypes(decl: ASTDecl, output_file: str = None) -> str:
         definition_content.extend(lines)
         definition_content.append("    ]\n")
 
-    content = "\n".join(import_content + forward_content + definition_content)
+    content = "\n".join(forward_content + definition_content)
+
+    return content
+
+
+def decl_to_ctypes(decl: ASTDecl, output_file: str = None) -> str:
+    # TODO union
+
+    import_content = ["from ctypes import *", "from enum import IntEnum", ""]
+
+    enum_content = enum_to_ctypes(decl.enum)
+    struct_content = struct_to_ctypes(decl.struct)
+
+    content = import_content
+    if enum_content:
+        content.append(enum_content)
+    if struct_content:
+        content.append(struct_content)
+
+    content = "\n".join(content)
 
     if output_file:
         with open(output_file, "w") as f:

@@ -1,6 +1,7 @@
 __pycache__
 uv.lock
 dist
+build
 
 .venv
 .tmp

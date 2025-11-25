@@ -1,6 +1,7 @@
 import json
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from .clang_helper import generate_ast_dict, preprocess_headers
 from .ctype_helper import ctyp
@@ -14,7 +15,7 @@ ast_type_map = {
 }
 
 
-def remove_ast_tags(node, tags: set[str]):
+def remove_ast_tags(node, tags: set[str]) -> None:
     """Recursively remove specific tags from AST."""
     if isinstance(node, dict):
         for tag in tags:
@@ -49,6 +50,8 @@ def headers_to_ast(
     if output_name is None:
         output_name = "header"
 
+    output_dir = Path(output_dir)
+
     header = preprocess_headers(
         files=files,
         includes=includes,
@@ -59,7 +62,9 @@ def headers_to_ast(
     )
     ast = generate_ast_dict(header, output_dir=output_dir)
     if clean:
-        ast = clean_ast_nodes(ast, include_files=[str(output_dir / f"{output_name}.h"), *files])
+        include_files = [output_dir / f"{output_name}.h", *files]
+        include_files = [str(Path(f).resolve()) for f in include_files]
+        ast = clean_ast_nodes(ast, include_files=include_files)
 
     if output_dir:
         with open(output_dir / "ast.json", "w") as f:
@@ -371,5 +376,6 @@ def parse_ast(ast: dict) -> ASTDecl:
             ...
 
     structs = update_record_typedef(structs, typedefs)
+    enums = update_record_typedef(enums, typedefs)
 
     return ASTDecl(ast=ast, typedef=typedefs, struct=structs, enum=enums)
