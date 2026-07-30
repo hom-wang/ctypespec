@@ -145,12 +145,13 @@ class CTypeDescriptor:
             elif self.flag.is_unsigned():
                 return (0, 2**self.bits - 1)
         elif self.flag.is_float():
-            if self.bits == CTypeFlags.BIT32:
+            # CTypeFlags derives from Flag, not IntFlag, so compare against plain ints here
+            if self.bits == 32:
                 return (-3.4e38, 3.4e38)
-            elif self.bits == CTypeFlags.BIT64:
+            elif self.bits == 64:
                 return (-1.7e308, 1.7e308)
-            elif self.bits == CTypeFlags.BIT128:
-                return (-1.1e4932, 1.1e4932)
+            elif self.bits == 128:
+                return (float("-inf"), float("inf"))  # 1.1e4932 is out of range for a Python float
         return None, None
 
     def clip(self, value) -> int | float | None:
@@ -163,11 +164,10 @@ class CTypeDescriptor:
 
     def to_value(self, value: str | int | float, clip: bool = False) -> int | float:
         try:
-            if isinstance(value, str):
-                converted_value = self.flag.str2value(value)
+            converted_value = self.flag.str2value(value)
         except ValueError as e:
             return f"Error converting {value} to {self.name}: {e}"
-        if clip:
+        if clip and converted_value is not None and self.min is not None:
             converted_value = max(self.min, min(converted_value, self.max))
         return converted_value
 
